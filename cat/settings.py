@@ -10,7 +10,11 @@ For the full list of settings and their values, see
 https://docs.djangoproject.com/en/5.2/ref/settings/
 """
 
+import os
 from pathlib import Path
+from datetime import timedelta
+from django.urls import reverse_lazy
+from django.utils.translation import gettext_lazy as _
 
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
 BASE_DIR = Path(__file__).resolve().parent.parent
@@ -31,13 +35,23 @@ ALLOWED_HOSTS = []
 # Application definition
 
 INSTALLED_APPS = [
-    "django.contrib.admin",
+    "unfold",  # before django.contrib.admin
+    "unfold.contrib.filters",  # optional, if special filters are needed
+    "unfold.contrib.forms",  # optional, if special form elements are needed
+    "unfold.contrib.inlines",  # optional, if special inlines are needed
+    "unfold.contrib.import_export",  # optional, if django-import-export package is used
+    "unfold.contrib.guardian",  # optional, if django-guardian package is used
+    "unfold.contrib.simple_history",  # optional, if django-simple-history package is used
+    "unfold.contrib.location_field",  # optional, if django-location-field package is used
+    "unfold.contrib.constance",  # optional, if django-constance package is used
+    "django.contrib.admin",  # required
     "django.contrib.auth",
     "django.contrib.contenttypes",
     "django.contrib.sessions",
     "django.contrib.messages",
     "django.contrib.staticfiles",
     "rest_framework",
+    "rest_framework_simplejwt",
     "cat.accounts.apps.AccountsConfig",
 ]
 
@@ -104,7 +118,7 @@ AUTH_PASSWORD_VALIDATORS = [
 # Internationalization
 # https://docs.djangoproject.com/en/5.2/topics/i18n/
 
-LANGUAGE_CODE = "en-us"
+LANGUAGE_CODE = "tr-tr"
 
 TIME_ZONE = "UTC"
 
@@ -117,8 +131,105 @@ USE_TZ = True
 # https://docs.djangoproject.com/en/5.2/howto/static-files/
 
 STATIC_URL = "static/"
+STATIC_ROOT = os.path.join(BASE_DIR, "staticfiles")
 
 # Default primary key field type
 # https://docs.djangoproject.com/en/5.2/ref/settings/#default-auto-field
 
 DEFAULT_AUTO_FIELD = "django.db.models.BigAutoField"
+
+
+UNFOLD = {
+    "SITE_TITLE": "Kedi Backend",
+    "SITE_HEADER": "Kedi Backend",
+    "SITE_SUBHEADER": "Kedi Backend",
+    "SITE_URL": "/",
+    "SITE_SYMBOL": "pets",  # symbol from icon set
+    "SHOW_HISTORY": True,  # show/hide "History" button, default: True
+    "SHOW_VIEW_ON_SITE": False,  # show/hide "View on site" button, default: True
+    "SHOW_BACK_BUTTON": False,  # show/hide "Back" button on changeform in header, default: False
+    "BORDER_RADIUS": "6px",
+    "COLORS": {
+        "base": {
+            "50": "oklch(98.5% .002 320)",
+            "100": "oklch(96.7% .003 320)",
+            "200": "oklch(92.8% .006 320)",
+            "300": "oklch(87.2% .01 320)",
+            "400": "oklch(70.7% .022 320)",
+            "500": "oklch(55.1% .027 320)",
+            "600": "oklch(44.6% .03 320)",
+            "700": "oklch(37.3% .034 320)",
+            "800": "oklch(27.8% .033 320)",
+            "900": "oklch(21% .034 320)",
+            "950": "oklch(13% .028 320)",
+        },
+        "primary": {
+            "50": "oklch(97.7% .014 320)",
+            "100": "oklch(94.6% .033 320)",
+            "200": "oklch(90.2% .063 320)",
+            "300": "oklch(82.7% .119 320)",
+            "400": "oklch(71.4% .203 320)",
+            "500": "oklch(62.7% .265 320)",
+            "600": "oklch(55.8% .288 320)",
+            "700": "oklch(49.6% .265 320)",
+            "800": "oklch(43.8% .218 320)",
+            "900": "oklch(38.1% .176 320)",
+            "950": "oklch(29.1% .149 320)",
+        },
+        "font": {
+            "subtle-light": "var(--color-base-500)",  # text-base-500
+            "subtle-dark": "var(--color-base-400)",  # text-base-400
+            "default-light": "var(--color-base-600)",  # text-base-600
+            "default-dark": "var(--color-base-300)",  # text-base-300
+            "important-light": "var(--color-base-900)",  # text-base-900
+            "important-dark": "var(--color-base-100)",  # text-base-100
+        },
+    },
+    "SIDEBAR": {
+        "show_search": True,  # Search in applications and models names
+        "command_search": False,  # Replace the sidebar search with the command search
+        "show_all_applications": False,  # Dropdown with all applications and models
+        "navigation": [
+            {
+                "title": _("Navigasyon"),
+                "separator": True,  # Top border
+                "collapsible": True,  # Collapsible group of links
+                "items": [
+                    {
+                        "title": _("Dashboard"),
+                        "icon": "dashboard",  # Supported icon set: https://fonts.google.com/icons
+                        "link": reverse_lazy("admin:index"),
+                    },
+                ],
+            },
+            {
+                "title": _("Yönetim"),
+                "separator": True,  # Top border
+                "collapsible": True,  # Collapsible group of links
+                "items": [
+                    {
+                        "title": _("Yöneticiler"),
+                        "icon": "manage_accounts",  # Supported icon set: https://fonts.google.com/icons
+                        "link": reverse_lazy("admin:auth_user_changelist"),
+                    },
+                    {
+                        "title": _("Gruplar"),
+                        "icon": "group",  # Supported icon set: https://fonts.google.com/icons
+                        "link": reverse_lazy("admin:auth_group_changelist"),
+                    },
+                    {
+                        "title": _("Kullanıcılar"),
+                        "icon": "face",  # Supported icon set: https://fonts.google.com/icons
+                        "link": reverse_lazy("admin:Accounts_accounts_changelist"),
+                    },
+                ],
+            },
+        ],
+    },
+}
+
+
+SIMPLE_JWT = {
+    "ACCESS_TOKEN_LIFETIME": timedelta(days=1),
+    "REFRESH_TOKEN_LIFETIME": timedelta(days=1),
+}
