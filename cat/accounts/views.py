@@ -116,6 +116,7 @@ def login(request):
         return Response({"error": str(e)}, status=status.HTTP_400_BAD_REQUEST)
 
 
+# TODO: permission_classes ekle
 @api_view(["GET"])
 def user_info(request):
     """Kullanıcı bilgileri fonksiyonu"""
